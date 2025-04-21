@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory Dashboard</title>
+
+  <!-- CSS dependencies -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+  <link href="https://fonts.googleapis.com/css?family=Calistoga" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+  <style>
+    body { font-family: 'Calistoga', cursive; background: #e8f0fe; }
+
+    /* Sidebar */
+    .sidebar { width:220px; background:#000; color:#fff; height:100vh; position:fixed; transition:width .3s; overflow:hidden; font-size:18px; }
+    .sidebar.collapsed { width:60px; }
+    .sidebar-header { padding:15px; text-align:center; }
+    .sidebar-header i { font-size:28px; color:#fff; cursor:pointer; }
+    .sidebar ul { list-style:none; padding:0; margin-top:20px; }
+    .sidebar ul li { padding:15px; white-space:nowrap; }
+    .sidebar ul li:hover, .sidebar ul li.active { background:#1e1e1e; }
+    .sidebar a { color:#fff; text-decoration:none; display:flex; align-items:center; }
+    .sidebar a i { width:24px; text-align:center; }
+    .sidebar.collapsed ul li a span { display:none; }
+
+    /* Main content */
+    .main-wrapper { margin-left:220px; padding:30px; transition:margin-left .3s; }
+    .main-wrapper.collapsed { margin-left:60px; }
+
+    /* Topbar */
+    .topbar { position:absolute; top:10px; right:20px; display:flex; align-items:center; }
+    .topbar .logout { cursor:pointer; color:#555; font-size:2.5rem; margin-right:20px; }
+    .topbar .logout:hover { text-decoration:underline; }
+    .topbar i.fa-user-circle { font-size:3rem; color:#333; cursor:pointer; }
+
+    /* Welcome message */
+    .welcome-msg { font-size:2.5rem; color:#333; margin-bottom:20px; }
+
+    /* Tabs */
+    .tabs { margin-top:20px; }
+    .tabs button {
+      padding:10px 20px;
+      margin-right:10px;
+      border:none;
+      background:#ddd;
+      cursor:pointer;
+      font-weight:bold;
+      font-size:1.4rem;     /* match other pages */
+    }
+    .tabs button.active { background:#333; color:#fff; }
+
+    /* Tab content */
+    .tab-content { display:none; margin-top:20px; }
+    .tab-content.active { display:block; }
+
+    /* Tables */
+    .table th { font-size:2.0rem; }  /* same as card headings */
+    .table td { font-size:1.8rem; }  /* same as card body text */
+    .table img { width:50px; }
+
+    /* Buttons global */
+    .btn {
+      font-size:1.4rem !important;   /* unify button size */
+      padding:8px 16px !important;
+      color: #000 !important;        /* black text */
+    }
+    .btn-success, .btn-primary {
+      margin-bottom:10px;            /* spacing under tab buttons etc */
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <i class="fa fa-bars" onclick="toggleSidebar()"></i>
+    </div>
+    <ul>
+    <li><a href="home.html"><i class="fa fa-home"></i> <span>Home</span></a></li>
+    <li><a href="dashboard.html"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+    <li><a href="inventory.html"><i class="fa fa-briefcase"></i> <span>Inventory</span></a></li>
+    <li><a href="suppliers.html"><i class="fa fa-truck"></i> <span>Suppliers</span></a></li>
+    <li><a href="sales.html"><i class="fa fa-file"></i> <span>Sales Orders</span></a></li>
+    <li><a href="purchase.html"><i class="fa fa-shopping-cart"></i> <span>Purchase Orders</span></a></li>
+    <li><a href="reports.html"><i class="fa fa-bar-chart"></i> <span>Data Viz</span></a></li>
+    <li class="active"><a href="data-model.html"><i class="fa fa-sitemap"></i> <span>Data Model</span></a></li>
+    <li><a href="about.html"><i class="fa fa-info-circle"></i> <span>About Us</span></a></li>
+  </ul>  </div>
+
+  <!-- Main Wrapper -->
+  <div class="main-wrapper" id="mainWrapper">
+    <!-- Topbar -->
+    <div class="topbar">
+      <span class="logout" onclick="$('#logoutModal').modal('show')">Logout</span>
+      <i class="fa fa-user-circle" onclick="openProfileModal()"></i>
+    </div>
+
+    <!-- Welcome -->
+    <div class="welcome-msg" id="welcomeMsg">Welcome, User</div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="stock">Stock</button>
+      <button class="tab-btn" data-tab="orders">Orders</button>
+    </div>
+
+    <!-- Stock Tab -->
+    <div id="stock" class="tab-content active">
+      <h3 style="font-size:2.2rem;">Stock Count</h3>
+      <button class="btn btn-success" onclick="openProductModal()">Add Product</button>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Cover</th>
+            <th>Name</th>
+            <th>Genre</th>
+            <th>Count</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="productList"></tbody>
+      </table>
+    </div>
+
+    <!-- Orders Tab -->
+    <div id="orders" class="tab-content">
+      <h3 style="font-size:2.2rem;">Orders</h3>
+      <button class="btn btn-primary" onclick="openOrderModal()">Create Order</button>
+      <div id="orderList" style="margin-top:15px;"></div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="logoutModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h4>Confirm Logout</h4></div>
+      <div class="modal-body"><p>Do you really want to logout?</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="logout()">Yes, Logout</button>
+        <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div></div>
+  </div>
+
+  <div id="productModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><form id="productForm" class="modal-content">
+      <div class="modal-header"><h4>Add / Edit Product</h4></div>
+      <div class="modal-body">
+        <input type="hidden" id="productId">
+        <input type="text" id="productName" class="form-control" placeholder="Product Name" required><br>
+        <input type="text" id="productGenre" class="form-control" placeholder="Genre" required><br>
+        <input type="number" id="productCount" class="form-control" placeholder="Count" required><br>
+        <input type="text" id="productImage" class="form-control" placeholder="Image URL">
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+
+  <div id="orderModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><form id="orderForm" class="modal-content">
+      <div class="modal-header"><h4>Create / Edit Order</h4></div>
+      <div class="modal-body">
+        <input type="hidden" id="orderIndex">
+        <input type="text" id="orderId" class="form-control" placeholder="Order ID" required><br>
+        <textarea id="orderText" class="form-control" placeholder="Order Details" required></textarea><br>
+        <input type="number" id="orderItems" class="form-control" placeholder="Items" required><br>
+        <input type="text"   id="orderCost"  class="form-control" placeholder="Cost"  required>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button"   class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+
+  <div id="profileModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h4>Profile Settings</h4></div>
+      <div class="modal-body">
+        <label>Full Name</label>
+        <input type="text" id="profileName" class="form-control"><br>
+        <label>Email</label>
+        <input type="email" id="profileEmail" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+        <button class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- JS dependencies -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <script>
+    // Sidebar toggle
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+      document.getElementById('mainWrapper').classList.toggle('collapsed');
+    }
+
+    // Welcome message
+    const currentUser = localStorage.getItem('currentUser') || 'User';
+    document.getElementById('welcomeMsg').textContent = `Welcome, ${currentUser}`;
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('currentUser');
+      location.href = 'index.html';
+    }
+
+    // Profile modal
+    function openProfileModal() { $('#profileModal').modal('show'); }
+    function saveProfile() {
+      localStorage.setItem('profile', JSON.stringify({
+        name:  document.getElementById('profileName').value,
+        email: document.getElementById('profileEmail').value
+      }));
+      $('#profileModal').modal('hide');
+    }
+
+    // On load
+    document.addEventListener("DOMContentLoaded", ()=>{
+      const prof = JSON.parse(localStorage.getItem("profile"))||{};
+      document.getElementById("profileName").value  = prof.name  || currentUser;
+      document.getElementById("profileEmail").value = prof.email || '';
+      renderProducts();
+      renderOrders();
+    });
+
+    // Product CRUD
+    function openProductModal(id=null) {
+      const f = document.getElementById("productForm"); f.reset();
+      if (id!==null) {
+        const p = JSON.parse(localStorage.getItem("products")||"[]")[id];
+        document.getElementById("productId").value    = id;
+        document.getElementById("productName").value  = p.name;
+        document.getElementById("productGenre").value = p.genre;
+        document.getElementById("productCount").value = p.count;
+        document.getElementById("productImage").value = p.image;
+      }
+      $('#productModal').modal('show');
+    }
+    document.getElementById("productForm").onsubmit = e => {
+      e.preventDefault();
+      const arr = JSON.parse(localStorage.getItem("products")||"[]");
+      const idx = document.getElementById("productId").value;
+      const rec = {
+        name:  document.getElementById("productName").value,
+        genre: document.getElementById("productGenre").value,
+        count: parseInt(document.getElementById("productCount").value, 10),
+        image: document.getElementById("productImage").value || "https://via.placeholder.com/50"
+      };
+      if (idx!=="") arr[idx] = rec; else arr.push(rec);
+      localStorage.setItem("products", JSON.stringify(arr));
+      $('#productModal').modal('hide');
+      renderProducts();
+    };
+    function renderProducts() {
+      const arr = JSON.parse(localStorage.getItem("products")||"[]");
+      const out = document.getElementById("productList");
+      out.innerHTML = "";
+      arr.forEach((p,i)=>{
+        out.innerHTML += `
+          <tr>
+            <td><img src="${p.image}" alt="${p.name}"></td>
+            <td>${p.name}</td>
+            <td>${p.genre}</td>
+            <td>${p.count}</td>
+            <td>
+              <button class="btn btn-info btn-sm"   onclick="openProductModal(${i})">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteProduct(${i})">Delete</button>
+            </td>
+          </tr>`;
+      });
+    }
+    function deleteProduct(i) {
+      const arr = JSON.parse(localStorage.getItem("products")||"[]");
+      arr.splice(i,1);
+      localStorage.setItem("products", JSON.stringify(arr));
+      renderProducts();
+    }
+
+    // Order CRUD
+    function openOrderModal(i=null) {
+      const f = document.getElementById("orderForm"); f.reset();
+      if (i!==null) {
+        const o = JSON.parse(localStorage.getItem("orders")||"[]")[i];
+        document.getElementById("orderIndex").value = i;
+        document.getElementById("orderId").value    = o.id;
+        document.getElementById("orderText").value  = o.text;
+        document.getElementById("orderItems").value= o.items;
+        document.getElementById("orderCost").value = o.cost;
+      }
+      $('#orderModal').modal('show');
+    }
+    document.getElementById("orderForm").onsubmit = e => {
+      e.preventDefault();
+      const arr = JSON.parse(localStorage.getItem("orders")||"[]");
+      const idx = document.getElementById("orderIndex").value;
+      const od = {
+        id:    document.getElementById("orderId").value,
+        text:  document.getElementById("orderText").value,
+        items: document.getElementById("orderItems").value,
+        cost:  document.getElementById("orderCost").value
+      };
+      if (idx!=="") arr[idx] = od; else arr.push(od);
+      localStorage.setItem("orders", JSON.stringify(arr));
+      $('#orderModal').modal('hide');
+      renderOrders();
+    };
+    function renderOrders() {
+      const arr = JSON.parse(localStorage.getItem("orders")||"[]");
+      const out = document.getElementById("orderList");
+      out.innerHTML = "";
+      arr.forEach((o,i)=>{
+        out.innerHTML += `
+          <div class="well">
+            <strong>Order #${o.id}</strong><br>
+            ${o.text}<br>
+            <em>Items:</em> ${o.items} | <strong>$${o.cost}</strong>
+            <div class="pull-right">
+              <button class="btn btn-info btn-sm"   onclick="openOrderModal(${i})">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteOrder(${i})">Delete</button>
+            </div>
+          </div>`;
+      });
+    }
+    function deleteOrder(i) {
+      const arr = JSON.parse(localStorage.getItem("orders")||"[]");
+      arr.splice(i,1);
+      localStorage.setItem("orders", JSON.stringify(arr));
+      renderOrders();
+    }
+
+    // Tab switching
+    document.querySelectorAll(".tab-btn").forEach(btn=>{
+      btn.onclick = ()=>{
+        document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      };
+    });
+  </script>
+</body>
+</html>
