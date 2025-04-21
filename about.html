@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About Us – Inventory Demand Optimizer</title>
+
+  <!-- CSS dependencies -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+  <link href="https://fonts.googleapis.com/css?family=Calistoga" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+  <style>
+    body { font-family: 'Calistoga', cursive; background: #e8f0fe; }
+
+    /* Sidebar */
+    .sidebar { width:220px; background:#000; color:#fff; height:100vh; position:fixed; transition:width .3s; overflow:hidden; font-size: 18px; }
+    .sidebar-header { padding:15px; text-align:center; }
+    .sidebar-header i { font-size:28px; color:#fff; cursor:pointer; }
+    .sidebar.collapsed { width:60px; }
+    .sidebar ul { list-style:none; padding:0; margin-top:20px; }
+    .sidebar ul li { padding:15px; white-space:nowrap; }
+    .sidebar ul li:hover,
+    .sidebar ul li.active { background:#1e1e1e; }
+    .sidebar a { color:#fff; text-decoration:none; display:flex; align-items:center; }
+    .sidebar a i { width:24px; text-align:center; }
+    .sidebar.collapsed ul li a span { display:none; }
+
+    /* Main wrapper */
+    .main-wrapper { margin-left:220px; padding:30px; transition:margin-left .3s; }
+    .main-wrapper.collapsed { margin-left:60px; }
+
+    /* Topbar */
+    .topbar { position:absolute; top:10px; right:20px; display:flex; align-items:center; }
+    .topbar .logout { cursor:pointer; color:#555; font-size:2.5rem; margin-right:20px; }
+    .topbar .logout:hover { text-decoration:underline; }
+    .topbar i.fa-user-circle { font-size:3rem; cursor:pointer; color:#333; }
+
+    /* Page title */
+    .page-title { font-size:3rem; color:#333; margin-bottom:20px; }
+
+    /* Team cards grid */
+    .team-card {
+      background:#fff;
+      border-radius:8px;
+      box-shadow:0 4px 8px rgba(0,0,0,0.1);
+      text-align:center;
+      padding:20px;
+      margin-bottom:30px;
+    }
+    .team-card img {
+      width: 180px;               /* width of portrait */
+      max-height: 220px;          /* bump this if hair is still cut off */
+      height: auto;               /* maintain aspect ratio */
+      object-fit: contain;        /* show entire image, no cropping */
+      border-radius:8px;
+      margin-bottom:15px;
+    }
+    .team-card h4 {
+      font-size:2rem;
+      margin-bottom:10px;
+    }
+    .team-card p {
+      font-size:1.4rem;
+      margin:0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <i class="fa fa-bars" onclick="toggleSidebar()"></i>
+    </div>
+    <ul>
+    <li><a href="home.html"><i class="fa fa-home"></i> <span>Home</span></a></li>
+    <li><a href="dashboard.html"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+    <li><a href="inventory.html"><i class="fa fa-briefcase"></i> <span>Inventory</span></a></li>
+    <li><a href="suppliers.html"><i class="fa fa-truck"></i> <span>Suppliers</span></a></li>
+    <li><a href="sales.html"><i class="fa fa-file"></i> <span>Sales Orders</span></a></li>
+    <li><a href="purchase.html"><i class="fa fa-shopping-cart"></i> <span>Purchase Orders</span></a></li>
+    <li><a href="reports.html"><i class="fa fa-bar-chart"></i> <span>Data Viz</span></a></li>
+    <li class="active"><a href="data-model.html"><i class="fa fa-sitemap"></i> <span>Data Model</span></a></li>
+    <li><a href="about.html"><i class="fa fa-info-circle"></i> <span>About Us</span></a></li>
+  </ul>  </div>
+
+  <!-- Main Content -->
+  <div class="main-wrapper" id="mainWrapper">
+    <!-- Topbar -->
+    <div class="topbar">
+      <span class="logout" onclick="$('#logoutModal').modal('show')">Logout</span>
+      <i class="fa fa-user-circle" onclick="openProfileModal()"></i>
+    </div>
+
+    <!-- Page title -->
+    <div class="page-title">About Us</div>
+
+    <!-- 2×2 Grid of team cards -->
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="team-card">
+            <img src="images/abhijith.jpg" alt="Abhijith Nallana">
+            <h4>Abhijith Nallana</h4>
+            <p><strong>Contributions:</strong> Designed the entire front-end UI of the Inventory Demand Optimizer including layout planning, card design, login/signup flows, and dashboard structure. Integrated responsive design principles for cross-device compatibility and visual appeal. Worked on the CSS transitions, modals, and card flip animations, ensuring a clean and interactive user experience.</p>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="team-card">
+            <img src="images/raghu.jpg" alt="Raghu Ram Komara">
+            <h4>Raghu Ram Komara</h4>
+            <p><strong>Contributions:</strong> Implemented core business logic by handling localStorage-based CRUD operations for inventory, sales, and purchase data. Developed JavaScript modules for dynamic data manipulation and integrated user session handling using localStorage. Ensured that all form inputs and dashboard modules could interact seamlessly without backend dependencies.</p>
+
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="team-card">
+            <img src="images/monica.jpg" alt="Monica Perumal Venkatesh">
+            <h4>Monica Perumal Venkatesh</h4>
+            <p><strong>Contributions:</strong> Developed all data visualization features using Chart.js including bar, line, and pie charts for sales trends, inventory distribution, and order statistics. Crafted reusable chart configuration objects and populated them with sample and dynamic data to simulate real-world analytics. Enhanced dashboard insight delivery through visual clarity and accurate rendering.</p>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="team-card">
+            <img src="images/neethika.jpg" alt="Neethika Kommidi">
+            <h4>Neethika Kommidi</h3>
+<p><strong>Contributions:</strong> Developed client-side form validation logic for login, signup, and inventory/order forms to ensure data quality and prevent user input errors. Wrote flow specifications and tested each functional module thoroughly to verify interactions and transitions. Handled the assignment report preparation, summarizing the full project execution, team roles, and final implementation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Modal -->
+  <div id="logoutModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h4>Confirm Logout</h4></div>
+      <div class="modal-body"><p>Do you really want to logout?</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="logout()">Yes, Logout</button>
+        <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h4>Profile Settings</h4></div>
+      <div class="modal-body">
+        <label>Full Name</label>
+        <input type="text" id="profileName" class="form-control"><br>
+        <label>Email</label>
+        <input type="email" id="profileEmail" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+        <button class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- JS Dependencies -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script>
+    // Sidebar toggle
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+      document.getElementById('mainWrapper').classList.toggle('collapsed');
+    }
+    // Logout
+    function logout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    }
+    // Profile modal
+    function openProfileModal() { $('#profileModal').modal('show'); }
+    function saveProfile() {
+      const name  = document.getElementById("profileName").value;
+      const email = document.getElementById("profileEmail").value;
+      localStorage.setItem("profile", JSON.stringify({ name, email }));
+      $('#profileModal').modal('hide');
+    }
+    // Populate profile fields
+    document.addEventListener("DOMContentLoaded", ()=>{
+      const prof = JSON.parse(localStorage.getItem("profile"))||{};
+      document.getElementById("profileName").value  = prof.name  || '';
+      document.getElementById("profileEmail").value = prof.email || '';
+    });
+  </script>
+</body>
+</html>
