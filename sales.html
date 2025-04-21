@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales Orders – Inventory Demand Optimizer</title>
+
+  <!-- Bootstrap & FontAwesome -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+  <link href="https://fonts.googleapis.com/css?family=Calistoga" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+  <style>
+    body { font-family: 'Calistoga', cursive; background-color: #e8f0fe; }
+    .btn { color: #000 !important; } /* all buttons black text */
+
+    /* Sidebar */
+    .sidebar {
+      width:220px; background:#000; color:#fff;
+      height:100vh; position:fixed; overflow:hidden;
+      transition: width .3s; font-size:18px;
+    }
+    .sidebar.collapsed { width:60px; }
+    .sidebar-header { padding:15px; text-align:center; }
+    .sidebar-header i { font-size:28px; color:#fff; cursor:pointer; }
+    .sidebar ul { list-style:none; padding:0; margin-top:20px; }
+    .sidebar ul li { padding:15px; white-space:nowrap; }
+    .sidebar ul li:hover, .sidebar ul li.active { background:#1e1e1e; }
+    .sidebar a { color:#fff; text-decoration:none; display:flex; align-items:center; }
+    .sidebar a i { width:24px; text-align:center; }
+    .sidebar.collapsed ul li a span { display:none; }
+
+    /* Main wrapper */
+    .main-wrapper {
+      margin-left:220px; padding:30px;
+      transition: margin-left .3s;
+    }
+    .main-wrapper.collapsed { margin-left:60px; }
+
+    /* Topbar */
+    .topbar {
+      position:absolute; top:10px; right:20px;
+      display:flex; align-items:center;
+    }
+    .topbar .logout {
+      cursor:pointer; color:#555; font-size:2.5rem; margin-right:20px;
+    }
+    .topbar .logout:hover { text-decoration:underline; }
+    .topbar i.fa-user-circle {
+      font-size:3rem; color:#333; cursor:pointer;
+    }
+
+    /* Title & Create button */
+    h2 { font-size:2.5rem; margin-top:0; }
+    .btn-success {
+      font-size:1.2rem; padding:10px 20px; margin-right:10px;
+    }
+
+    /* Filters */
+    .status-filters {
+      margin:20px 0;
+    }
+    .status-filters .btn {
+      font-size:1.2rem; padding:10px 20px; margin-right:10px;
+    }
+
+    /* ==== CARD STYLES ==== */
+    .row > .col-sm-4 { margin-bottom:20px; }
+    .panel-default { border-radius:8px; }
+    .panel-heading {
+      font-size:2.2rem;      /* same as suppliers */
+      text-align:center;
+    }
+    .panel-body p {
+      font-size:1.4rem;      /* same as suppliers */
+      margin-bottom:1rem;
+    }
+    .panel-body .btn {
+      font-size:1.4rem;      /* same as suppliers */
+      padding:8px 16px;
+      margin-right:5px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <i class="fa fa-bars" onclick="toggleSidebar()"></i>
+    </div>
+    <ul>
+    <li><a href="home.html"><i class="fa fa-home"></i> <span>Home</span></a></li>
+    <li><a href="dashboard.html"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+    <li><a href="inventory.html"><i class="fa fa-briefcase"></i> <span>Inventory</span></a></li>
+    <li><a href="suppliers.html"><i class="fa fa-truck"></i> <span>Suppliers</span></a></li>
+    <li><a href="sales.html"><i class="fa fa-file"></i> <span>Sales Orders</span></a></li>
+    <li><a href="purchase.html"><i class="fa fa-shopping-cart"></i> <span>Purchase Orders</span></a></li>
+    <li><a href="reports.html"><i class="fa fa-bar-chart"></i> <span>Data Viz</span></a></li>
+    <li class="active"><a href="data-model.html"><i class="fa fa-sitemap"></i> <span>Data Model</span></a></li>
+    <li><a href="about.html"><i class="fa fa-info-circle"></i> <span>About Us</span></a></li>
+  </ul>  </div>
+
+  <!-- Main Content -->
+  <div class="main-wrapper" id="mainWrapper">
+    <div class="topbar">
+      <span class="logout" onclick="$('#logoutModal').modal('show')">Logout</span>
+      <i class="fa fa-user-circle" onclick="openProfileModal()"></i>
+    </div>
+
+    <h2>Sales Orders</h2>
+    <button class="btn btn-success" onclick="openOrderModal()">Create Order</button>
+
+    <div class="status-filters">
+      <button class="btn btn-default" onclick="filterOrders('All')">All</button>
+      <button class="btn btn-primary" onclick="filterOrders('New')">New</button>
+      <button class="btn btn-warning" onclick="filterOrders('Confirmed')">Confirmed</button>
+      <button class="btn btn-success" onclick="filterOrders('Delivered')">Delivered</button>
+    </div>
+
+    <div class="row" id="orderGrid"></div>
+  </div>
+
+  <!-- Modals & Scripts -->
+  <div id="logoutModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h4>Confirm Logout</h4></div>
+      <div class="modal-body"><p>Do you really want to logout?</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="logout()">Yes, Logout</button>
+        <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div></div>
+  </div>
+  <div id="profileModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h4>Profile Settings</h4></div>
+      <div class="modal-body">
+        <label>Full Name</label>
+        <input type="text" id="profileName" class="form-control"><br>
+        <label>Email</label>
+        <input type="email" id="profileEmail" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+        <button class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div></div>
+  </div>
+  <div id="orderModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><form id="orderForm" class="modal-content">
+      <div class="modal-header"><h4>Create / Edit Order</h4></div>
+      <div class="modal-body">
+        <input type="hidden" id="orderIndex">
+        <input type="text"    id="orderId"     class="form-control" placeholder="Order ID" required><br>
+        <textarea id="orderText"   class="form-control" placeholder="Details" required></textarea><br>
+        <select   id="orderStatus" class="form-control" required>
+          <option>New</option>
+          <option>Confirmed</option>
+          <option>Delivered</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button"   class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </form></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script>
+    // Sidebar toggle
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+      document.getElementById('mainWrapper').classList.toggle('collapsed');
+    }
+    function logout() {
+      localStorage.removeItem('currentUser');
+      location.href='index.html';
+    }
+    function openProfileModal() { $('#profileModal').modal('show'); }
+    function saveProfile() {
+      localStorage.setItem('profile', JSON.stringify({
+        name:  document.getElementById('profileName').value,
+        email: document.getElementById('profileEmail').value
+      }));
+      $('#profileModal').modal('hide');
+    }
+
+    // Demo seed
+    const DEMO_ORDERS = [
+      { id:'SO-1001', text:'2× Widget Pro, 1× Gadget Plus',     status:'New' },
+      { id:'SO-1002', text:'3× OfficeChair XL',               status:'Confirmed' },
+      { id:'SO-1003', text:'1× Widget Pro, 2× OfficeChair XL', status:'Delivered' }
+    ];
+    document.addEventListener('DOMContentLoaded', ()=>{
+      if (!localStorage.getItem('orders')) {
+        localStorage.setItem('orders', JSON.stringify(DEMO_ORDERS));
+      }
+      renderOrders('All');
+      const prof = JSON.parse(localStorage.getItem('profile'))||{};
+      document.getElementById('profileName').value  = prof.name  || '';
+      document.getElementById('profileEmail').value = prof.email || '';
+    });
+
+    // CRUD & filtering
+    let currentFilter='All';
+    function filterOrders(f) {
+      currentFilter=f;
+      renderOrders(f);
+    }
+    function renderOrders(filter) {
+      const arr = JSON.parse(localStorage.getItem('orders')||'[]');
+      const grid = document.getElementById('orderGrid');
+      grid.innerHTML='';
+      arr.forEach((o,i)=>{
+        if (filter==='All'||o.status===filter) {
+          grid.innerHTML+=`
+            <div class="col-sm-4">
+              <div class="panel panel-default">
+                <div class="panel-heading">${o.id}</div>
+                <div class="panel-body">
+                  <p>${o.text}</p>
+                  <p><strong>Status:</strong> ${o.status}</p>
+                  <button class="btn btn-info btn-sm"   onclick="openOrderModal(${i})">Edit</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteOrder(${i})">Delete</button>
+                </div>
+              </div>
+            </div>`;
+        }
+      });
+    }
+    function openOrderModal(i=null) {
+      const f=document.getElementById('orderForm'); f.reset();
+      if (i!==null) {
+        const o=JSON.parse(localStorage.getItem('orders'))[i];
+        document.getElementById('orderIndex').value = i;
+        document.getElementById('orderId').value    = o.id;
+        document.getElementById('orderText').value  = o.text;
+        document.getElementById('orderStatus').value= o.status;
+      }
+      $('#orderModal').modal('show');
+    }
+    document.getElementById('orderForm').onsubmit = e => {
+      e.preventDefault();
+      const arr = JSON.parse(localStorage.getItem('orders')||'[]');
+      const idx = document.getElementById('orderIndex').value;
+      const rec = {
+        id:     document.getElementById('orderId').value,
+        text:   document.getElementById('orderText').value,
+        status: document.getElementById('orderStatus').value
+      };
+      if (idx!=='') arr[idx]=rec; else arr.push(rec);
+      localStorage.setItem('orders', JSON.stringify(arr));
+      $('#orderModal').modal('hide');
+      renderOrders(currentFilter);
+    };
+    function deleteOrder(i){
+      const arr=JSON.parse(localStorage.getItem('orders')||'[]');
+      arr.splice(i,1);
+      localStorage.setItem('orders', JSON.stringify(arr));
+      renderOrders(currentFilter);
+    }
+  </script>
+</body>
+</html>
