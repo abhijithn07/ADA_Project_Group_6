@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home – Inventory Demand Optimizer</title>
+
+  <!-- CSS dependencies -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"/>
+  <link href="https://fonts.googleapis.com/css?family=Calistoga" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+  <style>
+    body { font-family: 'Calistoga', cursive; background-color: #e8f0fe; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px; background: #000; color: #fff;
+      height: 100vh; position: fixed; overflow: hidden;
+      font-size: 18px; transition: width 0.3s;
+    }
+    .sidebar.collapsed { width: 60px; }
+    .sidebar-header { padding: 15px; text-align: center; }
+    .sidebar-header i.fa-bars { font-size: 28px; color: #fff; cursor: pointer; }
+    .sidebar ul { list-style: none; padding: 0; margin: 20px 0; }
+    .sidebar ul li { padding: 15px; white-space: nowrap; }
+    .sidebar ul li:hover, .sidebar ul li.active { background: #1e1e1e; }
+    .sidebar a { color: #fff; text-decoration: none; display: flex; align-items: center; }
+    .sidebar a i { width: 24px; text-align: center; }
+    .sidebar.collapsed ul li a span { display: none; }
+
+    /* Main wrapper */
+    .main-wrapper { margin-left: 220px; padding: 30px; transition: margin-left 0.3s; }
+    .main-wrapper.collapsed { margin-left: 60px; }
+
+    /* Topbar */
+    .topbar { position: absolute; top: 10px; right: 20px; display: flex; align-items: center; }
+    .topbar .logout { cursor: pointer; color: #555; font-size: 2.5rem; margin-right: 20px; }
+    .topbar .logout:hover { text-decoration: underline; }
+    .topbar i.fa-user-circle { font-size: 3rem; color: #333; cursor: pointer; }
+
+    /* Welcome */
+    .welcome-msg { font-size: 2.8rem; color: #333; margin-bottom: 25px; }
+
+    /* Intro Panel */
+    .intro-panel {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 30px;
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+    .intro-panel h2 { font-size: 3rem; margin-bottom: 20px; color: #222; }
+    .intro-panel h3 { font-size: 2rem; margin-top: 30px; color: #444; }
+    .intro-panel p { font-size: 1.4rem; margin-bottom: 20px; color: #444; }
+    .intro-panel ul { font-size: 1.3rem; margin-left: 20px; }
+    .intro-panel ul li { margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <i class="fa fa-bars" onclick="toggleSidebar()"></i>
+    </div>
+    <ul>
+    <li><a href="home.html"><i class="fa fa-home"></i> <span>Home</span></a></li>
+    <li><a href="dashboard.html"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+    <li><a href="inventory.html"><i class="fa fa-briefcase"></i> <span>Inventory</span></a></li>
+    <li><a href="suppliers.html"><i class="fa fa-truck"></i> <span>Suppliers</span></a></li>
+    <li><a href="sales.html"><i class="fa fa-file"></i> <span>Sales Orders</span></a></li>
+    <li><a href="purchase.html"><i class="fa fa-shopping-cart"></i> <span>Purchase Orders</span></a></li>
+    <li><a href="reports.html"><i class="fa fa-bar-chart"></i> <span>Data Viz</span></a></li>
+    <li class="active"><a href="data-model.html"><i class="fa fa-sitemap"></i> <span>Data Model</span></a></li>
+    <li><a href="about.html"><i class="fa fa-info-circle"></i> <span>About Us</span></a></li>
+  </ul>  </div>
+
+  <!-- Main Wrapper -->
+  <div class="main-wrapper" id="mainWrapper">
+    <!-- Topbar -->
+    <div class="topbar">
+      <span class="logout" onclick="logout()">Logout</span>
+      <i class="fa fa-user-circle" onclick="openProfileModal()"></i>
+    </div>
+
+    <!-- Welcome -->
+    <div class="welcome-msg" id="welcomeMsg">Welcome, User</div>
+
+    <!-- Unchanged Description -->
+    <div class="intro-panel">
+      <h2>Welcome to the Inventory Demand Optimizer</h2>
+      <p>Effective inventory management is crucial for businesses seeking operational efficiency and financial health. Without accurate forecasting and control, businesses risk overstocking—tying up valuable capital and increasing storage costs—or understocking, leading to lost sales and dissatisfied customers. The Inventory Demand Optimizer Web Application addresses these critical inventory challenges by leveraging advanced machine learning techniques to accurately forecast product demand, enabling businesses to manage inventory levels proactively and precisely.</p>
+
+      <h3>What Does This Application Offer?</h3>
+      <p>Our innovative application integrates powerful machine learning algorithms with a user-friendly interface, designed specifically to simplify inventory management tasks. It helps businesses anticipate customer demand with greater accuracy, optimize inventory levels, and reduce unnecessary overhead costs.</p>
+      <p>Here's a comprehensive and detailed breakdown of each feature provided through dedicated sections:</p>
+
+      <h3>Inventory Management (inventory)</h3>
+      <p>This feature serves as the core of our application, where users can efficiently manage their entire product catalog with full CRUD (Create, Read, Update, Delete) capabilities:</p>
+      <ul>
+        <li><strong>Create:</strong> Users can add new products by entering essential information like name, description, category, pricing, available quantity, reorder points, and supplier details.</li>
+        <li><strong>Read:</strong> Easily browse and inspect product lists, which include stock levels, pricing details, and reorder statuses, to stay informed on inventory health.</li>
+        <li><strong>Update:</strong> Effortlessly modify existing product information, allowing quick adjustments to quantities, pricing, or product specifications to keep your inventory data current.</li>
+        <li><strong>Delete:</strong> Safely remove obsolete or discontinued items, keeping your inventory list accurate and manageable.</li>
+      </ul>
+
+      <h3>Supplier Management (suppliers)</h3>
+      <p>Efficiently handle supplier relationships and contacts with detailed management features:</p>
+      <ul>
+        <li><strong>Create:</strong> Add comprehensive supplier profiles including contact information, delivery schedules, and product specialties.</li>
+        <li><strong>Read:</strong> Access and review supplier details conveniently, helping maintain clear and consistent supplier communication.</li>
+        <li><strong>Update:</strong> Keep supplier information updated to ensure smooth procurement operations.</li>
+        <li><strong>Delete:</strong> Remove suppliers that are no longer relevant, streamlining your supplier network.</li>
+      </ul>
+
+      <h3>Sales Management (sales)</h3>
+      <p>Simplify and automate your sales order processing:</p>
+      <ul>
+        <li><strong>Create:</strong> Initiate new sales orders quickly and easily, providing details such as customer information, product quantities, prices, and expected delivery dates.</li>
+        <li><strong>Read:</strong> View and manage existing sales orders, tracking their progress and ensuring timely fulfillment.</li>
+        <li><strong>Update:</strong> Edit sales orders to reflect changes in quantities, products, delivery timelines, or customer requests, maintaining flexibility.</li>
+        <li><strong>Delete:</strong> Cancel or remove outdated or erroneous sales orders, keeping your records accurate and clutter-free.</li>
+      </ul>
+
+      <h3>Purchase Management (purchase)</h3>
+      <p>Streamline procurement and replenishment processes to ensure optimal inventory levels:</p>
+      <ul>
+        <li><strong>Create:</strong> Generate new purchase orders with detailed product requirements, quantities, and delivery timelines.</li>
+        <li><strong>Read:</strong> Monitor all active and past purchase orders, providing clear visibility of procurement activities.</li>
+        <li><strong>Update:</strong> Adjust purchase orders as needed based on changes in demand, inventory status, or supplier capability.</li>
+        <li><strong>Delete:</strong> Efficiently cancel redundant or unnecessary purchase orders to optimize expenditure.</li>
+      </ul>
+
+      <h3>Dashboard (dashboard)</h3>
+      <p>Our dynamic and interactive dashboard presents real-time summaries and analytics of inventory, sales, and purchase activities, enabling swift decision-making. It provides visual insights into trends, inventory health, and forecast accuracy, keeping management informed at all times.</p>
+
+      <h3>Reports (reports)</h3>
+      <p>Generate and access detailed analytical reports that offer deep insights into sales trends, inventory management, forecasting accuracy, and performance metrics. Reports are available in various exportable formats, allowing for further analysis, sharing, and strategic decision-making.</p>
+    </div>
+  </div>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h4 class="modal-title">Profile Settings</h4></div>
+      <div class="modal-body">
+        <label>Full Name</label>
+        <input type="text" id="profileName" class="form-control"><br>
+        <label>Email</label>
+        <input type="email" id="profileEmail" class="form-control">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+        <button class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logoutModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog"><div class="modal-content">
+      <div class="modal-header"><h4 class="modal-title">Confirm Logout</h4></div>
+      <div class="modal-body"><p>Do you really want to logout?</p></div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" onclick="confirmLogout()">Yes, Logout</button>
+        <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- JS dependencies -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+      document.getElementById('mainWrapper').classList.toggle('collapsed');
+    }
+    const currentUser = localStorage.getItem('currentUser') || 'User';
+    document.getElementById('welcomeMsg').textContent = `Welcome, ${currentUser}`;
+    function logout() {
+      $('#logoutModal').modal('show');
+    }
+    function confirmLogout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    }
+    function openProfileModal() {
+      $('#profileModal').modal('show');
+    }
+    function saveProfile() {
+      const name  = document.getElementById("profileName").value;
+      const email = document.getElementById("profileEmail").value;
+      localStorage.setItem("profile", JSON.stringify({ name, email }));
+      $('#profileModal').modal('hide');
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+      const prof = JSON.parse(localStorage.getItem("profile")) || {};
+      document.getElementById("profileName").value  = prof.name  || currentUser;
+      document.getElementById("profileEmail").value = prof.email || '';
+    });
+  </script>
+</body>
+</html>

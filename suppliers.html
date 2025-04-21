@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Suppliers – Inventory Demand Optimizer</title>
+
+  <!-- CSS dependencies -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Calistoga" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <style>
+    body { font-family: 'Calistoga', cursive; background-color: #e8f0fe; }
+
+    /* Sidebar */
+    .sidebar { width: 220px; background: #000; color: #fff; height: 100vh; position: fixed; transition: width .3s; overflow: hidden; font-size:18px; }
+    .sidebar.collapsed { width:60px; }
+    .sidebar-header { padding:15px; text-align:center; }
+    .sidebar-header i.fa-bars { font-size:28px; color:#fff; cursor:pointer; }
+    .sidebar ul { list-style:none; padding:0; margin-top:20px; }
+    .sidebar ul li { padding:15px; white-space:nowrap; }
+    .sidebar ul li:hover, .sidebar ul li.active { background:#1e1e1e; }
+    .sidebar a { color:#fff; text-decoration:none; display:flex; align-items:center; }
+    .sidebar a i { width:24px; text-align:center; }
+    .sidebar.collapsed ul li a span { display:none; }
+
+    /* Main wrapper */
+    .main-wrapper { margin-left:220px; padding:30px; transition:margin-left .3s; }
+    .main-wrapper.collapsed { margin-left:60px; }
+
+    /* Topbar */
+    .topbar { position:absolute; top:10px; right:20px; display:flex; align-items:center; }
+    .topbar .logout { cursor:pointer; color:#555; font-size:2.5rem; margin-right:20px; }
+    .topbar .logout:hover { text-decoration:underline; }
+    .topbar i.fa-user-circle { font-size:3rem; color:#333; cursor:pointer; }
+
+    /* Page title & button */
+    .main-wrapper h2 { font-size:2.5rem; margin-top:0; }
+    .btn-success { background-color:#5cb85c; color:#000 !important; font-size:1.4rem; padding:12px 24px; }
+
+    /* Supplier cards */
+    .panel-default { border-radius:8px; }
+    .panel-heading { font-size:2.2rem; background:#f7f7f7; }
+    .panel-body p { font-size:1.4rem; margin-bottom:0.8rem; }
+    .panel-body p a { color:#337ab7; }
+    .panel-body .btn { font-size:1.4rem; padding:8px 16px; color:#000 !important; }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <i class="fa fa-bars" onclick="toggleSidebar()"></i>
+    </div>
+    <ul>
+    <li><a href="home.html"><i class="fa fa-home"></i> <span>Home</span></a></li>
+    <li><a href="dashboard.html"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
+    <li><a href="inventory.html"><i class="fa fa-briefcase"></i> <span>Inventory</span></a></li>
+    <li><a href="suppliers.html"><i class="fa fa-truck"></i> <span>Suppliers</span></a></li>
+    <li><a href="sales.html"><i class="fa fa-file"></i> <span>Sales Orders</span></a></li>
+    <li><a href="purchase.html"><i class="fa fa-shopping-cart"></i> <span>Purchase Orders</span></a></li>
+    <li><a href="reports.html"><i class="fa fa-bar-chart"></i> <span>Data Viz</span></a></li>
+    <li class="active"><a href="data-model.html"><i class="fa fa-sitemap"></i> <span>Data Model</span></a></li>
+    <li><a href="about.html"><i class="fa fa-info-circle"></i> <span>About Us</span></a></li>
+  </ul>
+  </div>
+
+  <!-- Main wrapper -->
+  <div class="main-wrapper" id="mainWrapper">
+    <!-- Topbar -->
+    <div class="topbar">
+      <span class="logout" onclick="$('#logoutModal').modal('show')">Logout</span>
+      <i class="fa fa-user-circle" onclick="openProfileModal()"></i>
+    </div>
+
+    <!-- Title & Add -->
+    <h2>Suppliers</h2>
+    <button class="btn btn-success" onclick="openSupplierModal()">Add Supplier</button>
+
+    <!-- Cards grid -->
+    <div class="container-fluid" style="margin-top:20px;">
+      <div class="row" id="supplierGrid"></div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="logoutModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h4>Confirm Logout</h4></div>
+    <div class="modal-body"><p>Do you really want to logout?</p></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="logout()">Yes, Logout</button>
+      <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+    </div>
+  </div></div></div>
+
+  <div id="profileModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h4>Profile Settings</h4></div>
+    <div class="modal-body">
+      <label>Full Name</label>
+      <input type="text" id="profileName" class="form-control"><br>
+      <label>Email</label>
+      <input type="email" id="profileEmail" class="form-control">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+      <button class="btn btn-default" data-dismiss="modal">Close</button>
+    </div>
+  </div></div></div>
+
+  <div id="supplierModal" class="modal fade" tabindex="-1"><div class="modal-dialog"><form id="supplierForm" class="modal-content">
+    <div class="modal-header"><h4>Add / Edit Supplier</h4></div>
+    <div class="modal-body">
+      <input type="hidden" id="supplierIndex">
+      <input type="text" id="supplierName" class="form-control" placeholder="Supplier Name" required><br>
+      <input type="text" id="supplierContact" class="form-control" placeholder="Contact Person" required><br>
+      <input type="email" id="supplierEmail" class="form-control" placeholder="Email" required><br>
+      <input type="tel" id="supplierPhone" class="form-control" placeholder="Phone" required>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary">Save</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+    </div>
+  </form></div></div>
+
+  <!-- JS deps -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+  <script>
+    // Sidebar toggle
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+      document.getElementById('mainWrapper').classList.toggle('collapsed');
+    }
+    // Logout
+    function logout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    }
+    // Profile
+    function openProfileModal() { $('#profileModal').modal('show'); }
+    function saveProfile() {
+      const name  = document.getElementById('profileName').value;
+      const email = document.getElementById('profileEmail').value;
+      localStorage.setItem('profile', JSON.stringify({name,email}));
+      $('#profileModal').modal('hide');
+    }
+    // Seed default suppliers if none
+    if (!localStorage.getItem('suppliers')) {
+      localStorage.setItem('suppliers', JSON.stringify([
+        {name:'Acme Co.',     contact:'John Doe',  email:'john.doe@acmeco.com',     phone:'123-456-7890'},
+        {name:'Global Supplies', contact:'Jane Smith',email:'jane.smith@globalsupplies.com', phone:'987-654-3210'},
+        {name:'TechParts Inc.', contact:'Sam Brown', email:'sam.brown@techparts.com',     phone:'555-123-4567'}
+      ]));
+    }
+
+    // Render cards
+    function renderSuppliers() {
+      const arr = JSON.parse(localStorage.getItem('suppliers')||'[]');
+      const grid = document.getElementById('supplierGrid');
+      grid.innerHTML = '';
+      arr.forEach((s,i) => {
+        grid.innerHTML += `
+          <div class="col-sm-4" style="margin-bottom:20px;">
+            <div class="panel panel-default">
+              <div class="panel-heading text-center">${s.name}</div>
+              <div class="panel-body">
+                <p><strong>Contact:</strong> ${s.contact}</p>
+                <p><strong>Email:</strong> <a href="mailto:${s.email}">${s.email}</a></p>
+                <p><strong>Phone:</strong> ${s.phone}</p>
+                <button class="btn btn-info btn-sm" onclick="openSupplierModal(${i})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteSupplier(${i})">Delete</button>
+              </div>
+            </div>
+          </div>`;
+      });
+    }
+
+    // Add/Edit modal
+    function openSupplierModal(idx=null) {
+      const f = document.getElementById('supplierForm'); f.reset();
+      if (idx!==null) {
+        const arr = JSON.parse(localStorage.getItem('suppliers')||'[]');
+        const s = arr[idx];
+        document.getElementById('supplierIndex').value   = idx;
+        document.getElementById('supplierName').value    = s.name;
+        document.getElementById('supplierContact').value = s.contact;
+        document.getElementById('supplierEmail').value   = s.email;
+        document.getElementById('supplierPhone').value   = s.phone;
+      }
+      $('#supplierModal').modal('show');
+    }
+    document.getElementById('supplierForm').onsubmit = e => {
+      e.preventDefault();
+      const arr = JSON.parse(localStorage.getItem('suppliers')||'[]');
+      const idx = document.getElementById('supplierIndex').value;
+      const rec = {
+        name:    document.getElementById('supplierName').value,
+        contact: document.getElementById('supplierContact').value,
+        email:   document.getElementById('supplierEmail').value,
+        phone:   document.getElementById('supplierPhone').value
+      };
+      if (idx!=='') arr[idx] = rec; else arr.push(rec);
+      localStorage.setItem('suppliers', JSON.stringify(arr));
+      $('#supplierModal').modal('hide');
+      renderSuppliers();
+    };
+
+    // Delete
+    function deleteSupplier(i) {
+      const arr = JSON.parse(localStorage.getItem('suppliers')||'[]'); arr.splice(i,1);
+      localStorage.setItem('suppliers', JSON.stringify(arr));
+      renderSuppliers();
+    }
+
+    // On load
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const prof = JSON.parse(localStorage.getItem('profile')||'{}');
+      document.getElementById('profileName').value  = prof.name||'';
+      document.getElementById('profileEmail').value = prof.email||'';
+      renderSuppliers();
+    });
+  </script>
+</body>
+</html>
